@@ -1,0 +1,71 @@
+*****Cloudera Manager Cluster Installation on Ubuntu****
+
+[CM Host]
+wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+chmod u+x cloudera-manager-installer.bin
+sudo ./cloudera-manager-installer.bin
+
+#After installation of Cloudera Manager Server, check the WebUI 
+#Check the db.properties files on CM node
+cat /etc/cloudera-scm-server/db.properties
+
+[MySQL Host]
+sudo apt-get install mysql-server -y
+
+#Configure the bind-address of mysql to listen it on its private ip
+cat /etc/mysql/my.cnf | grep bind-address
+
+sudo nano /etc/mysql/my.cnf
+
+sudo service mysql restart
+netstat -nltp | grep 3306
+---------Create Databases for Cluster Services to Use External MySQL database------------
+
+	#hive metastore	
+	create database metastore DEFAULT CHARACTER SET utf8;
+	grant all on metastore.* TO 'hive'@'%' IDENTIFIED BY 'hive_password';
+
+	#Hue
+	create database hue DEFAULT CHARACTER SET utf8;
+	grant all on hue.* TO 'hue'@'%' IDENTIFIED BY 'hue';
+
+	#Activity Monitor
+	create database amon DEFAULT CHARACTER SET utf8;
+	grant all on amon.* TO 'amon'@'%' IDENTIFIED BY 'amon';
+
+	#Reports Manager
+	create database rman DEFAULT CHARACTER SET utf8;
+	grant all on rman.* TO 'rman'@'%' IDENTIFIED BY 'rman';
+
+	#Navigator Audit Server
+	create database nav DEFAULT CHARACTER SET utf8;
+	grant all on nav.* TO 'nav'@'%' IDENTIFIED BY 'nav';
+
+	#Navigator Metadata Server
+	create database navms DEFAULT CHARACTER SET utf8;
+	grant all on navms.* TO 'navms'@'%' IDENTIFIED BY 'navms';
+
+	#Oozie Server
+	create database oozie DEFAULT CHARACTER SET utf8;
+	grant all on oozie.* TO 'oozie'@'%' IDENTIFIED BY 'oozie';
+	show databases;
+	exit;
+
+#install JDBC driver on all host.
+sudo apt-get install libmysql-java
+
+Example 1: Running the script when MySQL is installed on another host
+This example explains how to run the script on the Cloudera Manager Server host (myhost2) and 
+create and use a temporary MySQL user account to connect to MySQL remotely on the MySQL host (myhost1).
+At the myhost1 MySQL prompt, create a temporary user who can connect from myhost2:
+mysql> grant all on *.* to 'temp'@'%' identified by 'temp' with grant option;
+Query OK, 0 rows affected (0.00 sec)
+On the Cloudera Manager Server host (myhost2), run the script:
+$ sudo /usr/share/cmf/schema/scm_prepare_database.sh mysql -h 10.142.0.3 -u temp -p temp --scm-host 10.142.0.2 scm scm scm
+#restart the cloudera manager server for changes to take effect.
+sudo service cloudera-scm-server restart
+
+[MySQL Host]
+On myhost1, delete the temporary user:
+mysql> drop user 'temp'@'%';
+
