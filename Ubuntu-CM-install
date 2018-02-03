@@ -64,7 +64,7 @@ On the Cloudera Manager Server host (myhost2), run the script:
 $ sudo /usr/share/cmf/schema/scm_prepare_database.sh mysql -h 10.142.0.3 -u temp -p temp --scm-host 10.142.0.2 scm scm scm
 #restart the cloudera manager server for changes to take effect.
 sudo service cloudera-scm-server restart
-
+sysctl vm.swappiness=10
 [MySQL Host]
 On myhost1, delete the temporary user:
 mysql> drop user 'temp'@'%';
