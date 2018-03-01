@@ -1,9 +1,21 @@
 *****Cloudera Manager Cluster Installation on Ubuntu****
 
+#Install Cloudera Manager with any one of the step:
+##############Step1##############
 [CM Host]
 wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
 chmod u+x cloudera-manager-installer.bin
 sudo ./cloudera-manager-installer.bin
+
+##############Step2##############
+wget https://archive.cloudera.com/cm5/ubuntu/trusty/amd64/cm/cloudera.list
+sudo cp cloudera.list /etc/apt/sources.list.d/
+sudo apt-get update
+#nstall the JDK from a repository
+#The JDK is included in the Cloudera Manager 5 repositories. 
+#After downloading and editing the repo or list file, install the JDK as follows:
+sudo apt-get install oracle-j2sdk1.7
+
 
 #After installation of Cloudera Manager Server, check the WebUI 
 #Check the db.properties files on CM node
